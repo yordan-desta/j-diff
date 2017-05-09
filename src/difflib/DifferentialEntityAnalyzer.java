@@ -2,6 +2,7 @@ package difflib;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import sun.rmi.runtime.Log;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -21,7 +22,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
 
     private final HashMap<Field, Object> differenceValues = new HashMap<>();
 
-    private DifferentiableLevel differentiableLevel = DifferentiableLevel.SHALLOW;
+    private DifferentiableLevel differentiableLevel = DifferentiableLevel.SHALLOW_UPDATE;
 
     private T oldEntity, newEntity, referencer = null;
 
@@ -29,22 +30,28 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
 
     private static final Map<String, HashSet<Field>> clazzFieldsCache = new LinkedHashMap<>();
 
+    private static final int DEPTH_COUNT_MAX = 2;
+
     private boolean isRun;
 
-    public DifferentialEntityAnalyzer(@NotNull T oldEntity, @NotNull T newEntity, DifferentiableLevel differentiableLevel){
+    private int depthCount = 0;
+
+    public DifferentialEntityAnalyzer(@NotNull T oldEntity, @NotNull T newEntity, DifferentiableLevel differentiableLevel) {
 
         this(oldEntity, newEntity);
 
         setDifferentiableLevel(differentiableLevel);
     }
 
-    public DifferentialEntityAnalyzer(@NotNull T oldEntity, @NotNull T newEntity, boolean isReferenced, @Nullable T referencer) {
+    private DifferentialEntityAnalyzer(@NotNull T oldEntity, @NotNull T newEntity, boolean isReferenced, @Nullable T referencer, int depthCount) {
 
         this(oldEntity, newEntity);
 
         this.isReferenced = isReferenced;
 
         this.referencer = referencer;
+
+        this.depthCount = depthCount;
 
     }
 
@@ -57,7 +64,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
         this.newEntity = newEntity;
     }
 
-    public HashMap<Field, Object> runDifferential(){
+    public HashMap<Field, Object> runDifferential() {
 
         isRun = true;
 
@@ -75,15 +82,13 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
             throw new DifferentialException(errMsg, DifferentialException.TYPE_MISMATCH_EXCEPTION, new Throwable(errMsg));
 
 
-        } else if(oldEntity.getClass().getAnnotation(Differentiable.class) != null && oldEntity.getClass().getAnnotation(Differentiable.class).ignoreDiff()){
+        } else if (oldEntity.getClass().getAnnotation(Differentiable.class) != null && oldEntity.getClass().getAnnotation(Differentiable.class).ignoreDiff()) {
 
-            final String errMsg = oldEntity.getClazzName() +" is not differentiable class";
+            final String errMsg = oldEntity.getClazzName() + " is not differentiable class";
 
             throw new DifferentialException(errMsg, DifferentialException.NON_DIFFERENTIABLE_CLASS_EXCEPTION, new Throwable(errMsg));
 
-        }
-
-        else if (oldEntity.equals(newEntity)) {
+        } else if (oldEntity.equals(newEntity)) {
 
             final HashSet<Field> fields = (HashSet<Field>) getFields(oldEntity.getClass()).clone();
 
@@ -97,24 +102,45 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
 
                     if (DifferentiableEntity.class.isAssignableFrom(fieldType)) {
 
+                        if (differentiableLevel == DifferentiableLevel.SHALLOW_IGNORE) continue;
+
                         T _oldEntity = (T) field.get(oldEntity);
 
                         T _newEntity = (T) field.get(newEntity);
 
-                        if (isReferenced) {
+                        switch (differentiableLevel) {
 
-                            if (null != referencer && referencer.equals(_oldEntity))
+                            case SHALLOW_UPDATE:
+
+                                this.differenceValues.put(field, _newEntity);
+
+                                break;
+
+                            case DEEP:
+
+                                if (isReferenced) {
+
+                                    if (null != referencer && referencer.equals(_oldEntity))
+                                        continue;
+                                }
+
+                                final DifferentialEntityAnalyzer<T> differentialEntityAnalyzer = new DifferentialEntityAnalyzer(_oldEntity, _newEntity, true, oldEntity, depthCount + 1);
+
+                                if(depthCount >= DEPTH_COUNT_MAX)
+
+                                    differentialEntityAnalyzer.setDifferentiableLevel(DifferentiableLevel.SHALLOW_UPDATE);
+
+                                else differentialEntityAnalyzer.setDifferentiableLevel(DifferentiableLevel.DEEP);
+
+                                final HashMap<Field, Object> differenceValues = differentialEntityAnalyzer.runDifferential();
+
+                                if (differentialEntityAnalyzer.hasDifference())
+                                    this.differenceValues.put(field, differenceValues);
+
                                 continue;
+
                         }
 
-                        final DifferentialEntityAnalyzer<T> differentialEntityAnalyzer = new DifferentialEntityAnalyzer(_oldEntity, _newEntity, true, oldEntity);
-
-                        final HashMap<Field, Object> differenceValues = differentialEntityAnalyzer.runDifferential();
-
-                        if (differentialEntityAnalyzer.hasDifference())
-                            this.differenceValues.put(field, differenceValues);
-
-                        continue;
 
                     } else if (List.class.isAssignableFrom(fieldType)) {
 
@@ -181,7 +207,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
 
     public boolean hasDifference() {
 
-        if(!isRun)
+        if (!isRun)
             runDifferential();
 
         return !differenceValues.isEmpty();
@@ -189,7 +215,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
 
     public HashMap<Field, Object> getDifferenceValues() {
 
-        if(!isRun)
+        if (!isRun)
             return runDifferential();
 
         return differenceValues;
@@ -212,37 +238,37 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
 
             while (clazz.getSuperclass() != null) {
 
-                for(Field field : clazz.getDeclaredFields()){
+                for (Field field : clazz.getDeclaredFields()) {
 
                     Differentiable differentiable;
 
                     final Class<?> _clazz = field.getType();
 
-                    if(DifferentiableEntity.class.isAssignableFrom(_clazz)){
+                    if (DifferentiableEntity.class.isAssignableFrom(_clazz)) {
 
                         differentiable = _clazz.getAnnotation(Differentiable.class);
 
-                        if(differentiable != null && differentiable.ignoreDiff())
+                        if (differentiable != null && differentiable.ignoreDiff())
                             continue;
                     }
 
                     differentiable = field.getAnnotation(Differentiable.class);
 
-                    if(differentiable == null || !differentiable.ignoreDiff())
+                    if (differentiable == null || !differentiable.ignoreDiff())
                         fields.add(field);
                 }
 
                 clazz = clazz.getSuperclass();
             }
 
-            synchronized (clazzFieldsCache){
+            synchronized (clazzFieldsCache) {
 
                 clazzFieldsCache.put(key, fields);
             }
 
             return fields;
 
-        }else return fields;
+        } else return fields;
     }
 
     public DifferentiableLevel getDifferentiableLevel() {
