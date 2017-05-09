@@ -7,12 +7,17 @@ package difflib;
 public enum DifferentiableLevel {
 
     /**
-     * This level wil track the differential for primitive types and Strings. for custom class objects and lists, it will not go deeper and set the new field as the diff result;
+     * This level wil track the differential for primitive types and Strings. for custom class objects and lists, set the new field as the diff result. it will not go deeper;
      */
-    SHALLOW,
+    SHALLOW_UPDATE,
 
     /**
-     * what SHALLOW does plus it will give the diff for the fields of object fields. For example; if <br>
+     * This level will check the differential for primitive types and Strings. It will ignore for other objects
+     */
+    SHALLOW_IGNORE,
+
+    /**
+     * what SHALLOW_UPDATE does plus it will give the diff for the fields of object fields. For example; if <br>
      * <code>class A{ <br>
      * private int someInt; <br>
      * <p>
