@@ -138,6 +138,8 @@ public class DifferentialEntityTest{
 
     }
 
+    ///DEEP
+
     @Test
     public void checkIfNoDifferencialDetectedDeep() {
 
@@ -192,4 +194,98 @@ public class DifferentialEntityTest{
 
         Assert.assertFalse(differentialEntityAnalyzer.hasDifference());
     }
+
+    ////SHALLOW_UPDATE
+
+    @Test
+    public void checkIfNoDifferentialDetectedShallowUpdate() {
+
+        DifferentialEntityAnalyzer<A> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a2, DifferentiableLevel.SHALLOW_UPDATE);
+
+        differentialEntityAnalyzer.runDifferential();
+
+        Assert.assertFalse(differentialEntityAnalyzer.hasDifference());
+    }
+
+    @Test
+    public void checkIfDifferentialDetectedShallowUpdate() {
+
+        DifferentialEntityAnalyzer differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a3, DifferentiableLevel.SHALLOW_UPDATE);
+        differentialEntityAnalyzer.runDifferential();
+
+        Assert.assertTrue(differentialEntityAnalyzer.hasDifference());
+    }
+
+    @Test
+    public void checkIfDiffDetectedWithCrossClassRefShallowUpdate() {
+
+        DifferentialEntityAnalyzer<B> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<B>(b1, b2, DifferentiableLevel.SHALLOW_UPDATE);
+        differentialEntityAnalyzer.runDifferential();
+
+        Assert.assertTrue(differentialEntityAnalyzer.hasDifference());
+
+
+        DifferentialEntityAnalyzer<B> differentialEntityAnalyzer2 = new DifferentialEntityAnalyzer<B>(b1, b3, DifferentiableLevel.SHALLOW_UPDATE);
+        differentialEntityAnalyzer2.runDifferential();
+
+        Assert.assertTrue(differentialEntityAnalyzer2.hasDifference());
+
+        DifferentialEntityAnalyzer<C> differentialEntityAnalyzer3 = new DifferentialEntityAnalyzer<>(c1, c3, DifferentiableLevel.SHALLOW_UPDATE);
+        differentialEntityAnalyzer3.runDifferential();
+
+        Assert.assertTrue(differentialEntityAnalyzer3.hasDifference());
+
+        DifferentialEntityAnalyzer<C> differentialEntityAnalyzer4 = new DifferentialEntityAnalyzer<>(c1, c2, DifferentiableLevel.SHALLOW_UPDATE);
+        differentialEntityAnalyzer4.runDifferential();
+
+        Assert.assertTrue(differentialEntityAnalyzer4.hasDifference());
+    }
+
+    ///SHALLOW_IGNORE
+
+    @Test
+    public void checkIfNoDifferentialDetectedShallowIgnore() {
+
+        DifferentialEntityAnalyzer<A> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a2, DifferentiableLevel.SHALLOW_IGNORE);
+
+        differentialEntityAnalyzer.runDifferential();
+
+        Assert.assertFalse(differentialEntityAnalyzer.hasDifference());
+    }
+
+    @Test
+    public void checkIfDifferentialDetectedShallowIgnore() {
+
+        DifferentialEntityAnalyzer differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a3, DifferentiableLevel.SHALLOW_IGNORE);
+        differentialEntityAnalyzer.runDifferential();
+
+        Assert.assertTrue(differentialEntityAnalyzer.hasDifference());
+    }
+
+    @Test
+    public void checkNoIfDiffDetectedWithCrossClassRefShallowIgnore() {
+
+        DifferentialEntityAnalyzer<B> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<B>(b1, b2, DifferentiableLevel.SHALLOW_IGNORE);
+        differentialEntityAnalyzer.runDifferential();
+
+        Assert.assertFalse(differentialEntityAnalyzer.hasDifference());
+
+
+        DifferentialEntityAnalyzer<B> differentialEntityAnalyzer2 = new DifferentialEntityAnalyzer<B>(b1, b3, DifferentiableLevel.SHALLOW_IGNORE);
+        differentialEntityAnalyzer2.runDifferential();
+
+        Assert.assertFalse(differentialEntityAnalyzer2.hasDifference());
+
+    }
+
+    @Test
+    public void checkIfDiffDetectedWithCrossClassRefShallowIgnore() {
+
+        DifferentialEntityAnalyzer<B> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<B>(b1, b4, DifferentiableLevel.SHALLOW_IGNORE);
+        differentialEntityAnalyzer.runDifferential();
+
+        Assert.assertTrue(differentialEntityAnalyzer.hasDifference());
+
+    }
+
 }
