@@ -1,7 +1,11 @@
 package difflib;
 
 /**
- * Author: Yordanos Desta, on 5/2/17.
+ * Author: Yordanos Desta, on 5/2/17. <br>
+ *
+ * This class can help as a base class for other entities to extend from. By default evey class that extends from this class is considered
+ *
+ * differentiable. But you can use the {@link Differentiable} annotation to change its behaviour
  */
 
 @Differentiable
@@ -29,18 +33,25 @@ public abstract class DifferentiableEntity implements IDifferentiable {
         this.uuid = uuid;
     }
 
+    /**
+     * returns the class name
+     * @return class name
+     */
     public String getClazzName() {
         return clazzName;
     }
 
+    /**
+     * This method determines whether the two objects are comparable or not. Two Differentiable POJOs should be equal inorder to be comparable;
+     * By default, i.e unless the {@link #uuid} property is set by {@link #setUuid(String)} method two objects of the same class instance are
+     * considered equal and eligible to differentiate.
+     *
+     * @param o object to be compared with
+     * @return boolean - whether the should be comparable or not
+     */
     @Override
     public boolean equals(Object o) {
 
-        if(o != null && o instanceof DifferentiableEntity){
-
-            return ((DifferentiableEntity) o).getUuid().equals(this.uuid);
-        }
-
-        return false;
+        return o != null && o instanceof DifferentiableEntity && ((DifferentiableEntity) o).getUuid().equals(this.uuid);
     }
 }

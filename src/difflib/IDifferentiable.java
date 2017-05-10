@@ -7,10 +7,10 @@ package difflib;
 public interface IDifferentiable {
     /**
      * required by any differentiable entity to be implemented
-     * @param o
-     * @return
+     * @param o object to be compared with
+     * @return boolean
      */
-    public boolean equals(Object o);
+    boolean equals(Object o);
 
-    public String getClazzName();
+    String getClazzName();
 }
