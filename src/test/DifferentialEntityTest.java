@@ -11,9 +11,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.UUID;
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * Author: Yordanos Desta, on 5/2/17.
@@ -154,7 +153,6 @@ public class DifferentialEntityTest{
     public void checkIfDifferencialDetectedDeep() {
 
         DifferentialEntityAnalyzer differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a3, DifferentiableLevel.DEEP);
-        differentialEntityAnalyzer.runDifferential();
 
         Assert.assertTrue(differentialEntityAnalyzer.hasDifference());
     }
