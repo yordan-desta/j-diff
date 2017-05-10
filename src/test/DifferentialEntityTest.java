@@ -23,7 +23,7 @@ import java.util.*;
  */
 
 @RunWith(JUnit4.class)
-public class DifferentialEntityTest{
+public class DifferentialEntityTest {
 
 
     @Differentiable(ignoreDiff = false)
@@ -118,7 +118,10 @@ public class DifferentialEntityTest{
         a1 = new A(1, 2d, "string", Calendar.getInstance().getTime(), UUID.randomUUID().toString());
         a2 = new A(1, 2d, "string", a1.getDateValue(), a1.getUuid());
 
-        a3 = new A(2, 3d, "string", Calendar.getInstance().getTime(), a1.getUuid());
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, 1);
+
+        a3 = new A(2, 3d, "string", calendar.getTime(), a1.getUuid());
 
         final String b_uuid = UUID.randomUUID().toString();
 
@@ -140,7 +143,7 @@ public class DifferentialEntityTest{
     }
 
     /**
-     *  Tests with DifferentiableLevel.DEEP flag
+     * Tests with DifferentiableLevel.DEEP flag
      */
 
     @Test
@@ -149,6 +152,8 @@ public class DifferentialEntityTest{
         DifferentialEntityAnalyzer<A> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a2, DifferentiableLevel.DEEP);
 
         differentialEntityAnalyzer.runDifferential();
+
+        Assert.assertFalse(differentialEntityAnalyzer.getPrettyJson().equals("{}"));
 
         Assert.assertFalse(differentialEntityAnalyzer.hasDifference());
     }
@@ -162,7 +167,16 @@ public class DifferentialEntityTest{
 
         String json = differentialEntityAnalyzer.getPrettyJson();
 
+        String expectedJson = "{\n" +
+                "    \"dateValue\": \"" +
+                "" + a3.getDateValue() + "\",\n" +
+                "    \"doubleValue\": \"" + a3.getDoubleValue() + "\",\n" +
+                "    \"intValue\": \"" + a3.getIntValue() + "\"\n" +
+                "}";
+
         Assert.assertTrue(isJsonValid(json));
+
+        Assert.assertTrue(areJsonEqual(json, expectedJson));
 
         Assert.assertTrue(differentialEntityAnalyzer.hasDifference());
     }
@@ -172,6 +186,8 @@ public class DifferentialEntityTest{
 
         DifferentialEntityAnalyzer<B> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<B>(b1, b2, DifferentiableLevel.DEEP);
         differentialEntityAnalyzer.runDifferential();
+
+        Assert.assertFalse(differentialEntityAnalyzer.getPrettyJson().equals("{}"));
 
         Assert.assertFalse(differentialEntityAnalyzer.hasDifference());
     }
@@ -190,7 +206,7 @@ public class DifferentialEntityTest{
     }
 
     @Test
-    public void checkIfDiffDetectedWith2LevelClassDepthDeep(){
+    public void checkIfDiffDetectedWith2LevelClassDepthDeep() {
 
         DifferentialEntityAnalyzer<C> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<>(c1, c3, DifferentiableLevel.DEEP);
         differentialEntityAnalyzer.runDifferential();
@@ -205,16 +221,19 @@ public class DifferentialEntityTest{
     }
 
     @Test
-    public void checkIfNoDiffDetectedWith2LevelClassDepthDeep(){
+    public void checkIfNoDiffDetectedWith2LevelClassDepthDeep() {
 
         DifferentialEntityAnalyzer<C> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<>(c1, c2, DifferentiableLevel.DEEP);
         differentialEntityAnalyzer.runDifferential();
 
+        String json = differentialEntityAnalyzer.getPrettyJson();
+
+        Assert.assertTrue(isJsonValid(json));
         Assert.assertFalse(differentialEntityAnalyzer.hasDifference());
     }
 
     /**
-     *  Tests with DifferentiableLevel.SHALLOW_UPDATE flag
+     * Tests with DifferentiableLevel.SHALLOW_UPDATE flag
      */
     @Test
     public void checkIfNoDifferentialDetectedShallowUpdate() {
@@ -222,6 +241,12 @@ public class DifferentialEntityTest{
         DifferentialEntityAnalyzer<A> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a2, DifferentiableLevel.SHALLOW_UPDATE);
 
         differentialEntityAnalyzer.runDifferential();
+
+        String json = differentialEntityAnalyzer.getPrettyJson();
+
+        Assert.assertTrue(isJsonValid(json));
+
+        Assert.assertFalse(differentialEntityAnalyzer.getPrettyJson().equals("{}"));
 
         Assert.assertFalse(differentialEntityAnalyzer.hasDifference());
     }
@@ -232,6 +257,10 @@ public class DifferentialEntityTest{
         DifferentialEntityAnalyzer differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a3, DifferentiableLevel.SHALLOW_UPDATE);
         differentialEntityAnalyzer.runDifferential();
 
+        String json = differentialEntityAnalyzer.getPrettyJson();
+
+        Assert.assertTrue(isJsonValid(json));
+
         Assert.assertTrue(differentialEntityAnalyzer.hasDifference());
     }
 
@@ -240,6 +269,10 @@ public class DifferentialEntityTest{
 
         DifferentialEntityAnalyzer<B> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<B>(b1, b2, DifferentiableLevel.SHALLOW_UPDATE);
         differentialEntityAnalyzer.runDifferential();
+
+        String json = differentialEntityAnalyzer.getPrettyJson();
+
+        Assert.assertTrue(isJsonValid(json));
 
         Assert.assertTrue(differentialEntityAnalyzer.hasDifference());
 
@@ -261,7 +294,7 @@ public class DifferentialEntityTest{
     }
 
     /**
-     *  Tests with DifferentiableLevel.SHALLOW_IGNORE flag
+     * Tests with DifferentiableLevel.SHALLOW_IGNORE flag
      */
     @Test
     public void checkIfNoDifferentialDetectedShallowIgnore() {
@@ -269,6 +302,12 @@ public class DifferentialEntityTest{
         DifferentialEntityAnalyzer<A> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a2, DifferentiableLevel.SHALLOW_IGNORE);
 
         differentialEntityAnalyzer.runDifferential();
+
+        String json = differentialEntityAnalyzer.getPrettyJson();
+
+        Assert.assertTrue(isJsonValid(json));
+
+        Assert.assertFalse(differentialEntityAnalyzer.getPrettyJson().equals("{}"));
 
         Assert.assertFalse(differentialEntityAnalyzer.hasDifference());
     }
@@ -279,6 +318,10 @@ public class DifferentialEntityTest{
         DifferentialEntityAnalyzer differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a3, DifferentiableLevel.SHALLOW_IGNORE);
         differentialEntityAnalyzer.runDifferential();
 
+        String json = differentialEntityAnalyzer.getPrettyJson();
+
+        Assert.assertTrue(isJsonValid(json));
+
         Assert.assertTrue(differentialEntityAnalyzer.hasDifference());
     }
 
@@ -286,7 +329,14 @@ public class DifferentialEntityTest{
     public void checkNoIfDiffDetectedWithCrossClassRefShallowIgnore() {
 
         DifferentialEntityAnalyzer<B> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<B>(b1, b2, DifferentiableLevel.SHALLOW_IGNORE);
+
         differentialEntityAnalyzer.runDifferential();
+
+        String json = differentialEntityAnalyzer.getPrettyJson();
+
+        Assert.assertTrue(isJsonValid(json));
+
+        Assert.assertFalse(differentialEntityAnalyzer.getPrettyJson().equals("{}"));
 
         Assert.assertFalse(differentialEntityAnalyzer.hasDifference());
 
@@ -304,11 +354,15 @@ public class DifferentialEntityTest{
         DifferentialEntityAnalyzer<B> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<B>(b1, b4, DifferentiableLevel.SHALLOW_IGNORE);
         differentialEntityAnalyzer.runDifferential();
 
+        String json = differentialEntityAnalyzer.getPrettyJson();
+
+        Assert.assertTrue(isJsonValid(json));
+
         Assert.assertTrue(differentialEntityAnalyzer.hasDifference());
 
     }
 
-    private boolean isJsonValid(final String json){
+    private boolean isJsonValid(final String json) {
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -321,6 +375,38 @@ public class DifferentialEntityTest{
         }
 
         return true;
+    }
+
+    private boolean areJsonEqual(String json1, String json2) {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+
+            Map<String, String> j1 = objectMapper.readValue(json1, Map.class),
+
+                    j2 = objectMapper.readValue(json2, Map.class);
+
+            if (j1.size() != j2.size())
+                return false;
+
+            for (String k : j1.keySet()) {
+
+                if (j1.get(k) != null && j2.get(k) == null)
+                    return false;
+
+                if (!j1.get(k).equals(j2.get(k)))
+                    return false;
+            }
+
+            return true;
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
 }
