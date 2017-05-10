@@ -15,6 +15,7 @@ import java.util.*;
  * Author: Yordanos Desta, on 5/2/17.
  * <p>
  * This class performs a differential operation on IDifferentiable POJOs
+ * </p>
  */
 
 @SuppressWarnings("unchecked")
@@ -39,6 +40,8 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> implements ID
     private static ObjectMapper objectMapper;
 
     private static final Object mapperSyncLock = new Object();
+
+    private String jsonValue;
 
     public DifferentialEntityAnalyzer(@NotNull T oldEntity, @NotNull T newEntity, DifferentiableLevel differentiableLevel) {
 
@@ -265,16 +268,22 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> implements ID
         if (!isRun)
             throwNotRunException();
 
+        if(jsonValue != null)
+
+            return jsonValue;
+
         final ObjectWriter writer = getObjectMapper().writer().withDefaultPrettyPrinter();
 
         try {
 
-            return writer.writeValueAsString(differenceValues);
+            jsonValue = writer.writeValueAsString(differenceValues);
 
         } catch (JsonProcessingException e) {
 
             throw new DifferentialException(e.getLocalizedMessage(), DifferentialException.RUNTIME_ERROR, e);
         }
+
+        return jsonValue;
 
     }
 
