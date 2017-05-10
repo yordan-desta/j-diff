@@ -13,10 +13,12 @@ import java.util.*;
 
 /**
  * Author: Yordanos Desta, on 5/2/17.
+ * <p>
+ * This class performs a differential operation on IDifferentiable POJOs
  */
 
 @SuppressWarnings("unchecked")
-public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
+public class DifferentialEntityAnalyzer<T extends IDifferentiable> implements IDifferentialEntityAnalyzer {
 
     private final HashMap<Field, Object> differenceValues = new HashMap<>();
 
@@ -34,7 +36,9 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
 
     private int depthCount = 0;
 
-    private ObjectMapper objectMapper;
+    private static ObjectMapper objectMapper;
+
+    private static final Object mapperSyncLock = new Object();
 
     public DifferentialEntityAnalyzer(@NotNull T oldEntity, @NotNull T newEntity, DifferentiableLevel differentiableLevel) {
 
@@ -303,19 +307,22 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
 
     private ObjectMapper getObjectMapper() {
 
-        if (objectMapper == null) {
+        synchronized (mapperSyncLock) {
 
-            objectMapper = new ObjectMapper();
+            if (objectMapper == null) {
 
-            SimpleModule simpleModule = new SimpleModule();
+                objectMapper = new ObjectMapper();
 
-            simpleModule.addSerializer((Class<? extends HashMap<Field, Object>>) differenceValues.getClass(), new FieldSerializer());
+                final SimpleModule simpleModule = new SimpleModule();
 
-            objectMapper.registerModule(simpleModule);
+                simpleModule.addSerializer((Class<? extends HashMap<Field,Object>>) differenceValues.getClass(), new FieldSerializer());
 
-            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+                objectMapper.registerModule(simpleModule);
+
+                objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+            }
+
+            return objectMapper;
         }
-
-        return objectMapper;
     }
 }
