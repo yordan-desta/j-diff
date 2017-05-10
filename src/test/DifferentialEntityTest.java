@@ -139,7 +139,9 @@ public class DifferentialEntityTest{
 
     }
 
-    ///DEEP
+    /**
+     *  Tests with DifferentiableLevel.DEEP flag
+     */
 
     @Test
     public void checkIfNoDifferencialDetectedDeep() {
@@ -211,8 +213,9 @@ public class DifferentialEntityTest{
         Assert.assertFalse(differentialEntityAnalyzer.hasDifference());
     }
 
-    ////SHALLOW_UPDATE
-
+    /**
+     *  Tests with DifferentiableLevel.SHALLOW_UPDATE flag
+     */
     @Test
     public void checkIfNoDifferentialDetectedShallowUpdate() {
 
@@ -257,8 +260,9 @@ public class DifferentialEntityTest{
         Assert.assertTrue(differentialEntityAnalyzer4.hasDifference());
     }
 
-    ///SHALLOW_IGNORE
-
+    /**
+     *  Tests with DifferentiableLevel.SHALLOW_IGNORE flag
+     */
     @Test
     public void checkIfNoDifferentialDetectedShallowIgnore() {
 
