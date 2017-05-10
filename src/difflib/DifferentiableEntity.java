@@ -50,7 +50,7 @@ public abstract class DifferentiableEntity implements IDifferentiable {
      * @return boolean - whether the should be comparable or not
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean isEqual(Object o) {
 
         return o != null && o instanceof DifferentiableEntity && ((DifferentiableEntity) o).getUuid().equals(this.uuid);
     }

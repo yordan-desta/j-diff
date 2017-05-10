@@ -95,7 +95,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> implements ID
 
             throw new DifferentialException(errMsg, DifferentialException.NON_DIFFERENTIABLE_CLASS_EXCEPTION, new Throwable(errMsg));
 
-        } else if (oldEntity.equals(newEntity)) {
+        } else if (oldEntity.isEqual(newEntity)) {
 
             final HashSet<Field> fields = (HashSet<Field>) getFields(oldEntity.getClass()).clone();
 
@@ -127,7 +127,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> implements ID
 
                                 if (isReferenced) {
 
-                                    if (null != referencer && referencer.equals(_oldEntity))
+                                    if (null != referencer && referencer.isEqual(_oldEntity))
                                         continue;
                                 }
 
