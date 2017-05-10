@@ -8,10 +8,10 @@ import java.util.HashMap;
 /**
  * Author : Yordanos Desta, on 5/10/17.
  *
- * This class performs a Differential operation on a {@link IDifferentiable} class asynchronously and returns {@link AsyncDiffResult} object
+ * This class performs a Differential operation on a {@link IDifferentiableEntity} class asynchronously and returns {@link AsyncDiffResult} object
  * to the result
  */
-public class DifferentialEntityAnalyzerAsync<C extends IDifferentiableCallback, T extends IDifferentiable>{
+public class DifferentialEntityAnalyzerAsync<C extends IDifferentiableCallback, T extends IDifferentiableEntity>{
 
     private Runnable runnable = null;
 

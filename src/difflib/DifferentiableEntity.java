@@ -9,7 +9,7 @@ package difflib;
  */
 
 @Differentiable
-public abstract class DifferentiableEntity implements IDifferentiable {
+public abstract class DifferentiableEntity implements IDifferentiableEntity {
 
     @Differentiable(ignoreDiff = true)
     private final String clazzName = this.getClass().getSimpleName();

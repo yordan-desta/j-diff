@@ -5,7 +5,7 @@ package difflib;
  *
  * An Interface that will be called by {@link DifferentialEntityAnalyzerAsync}, when the operation completes.
  */
-public interface IDifferentiableCallback extends IDifferentiable {
+public interface IDifferentiableCallback extends IDifferentiableEntity {
 
     public void onSuccess(AsyncDiffResult asyncDiffResult);
 

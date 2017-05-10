@@ -14,12 +14,12 @@ import java.util.*;
 /**
  * Author: Yordanos Desta, on 5/2/17.
  * <p>
- * This class performs a differential operation on IDifferentiable POJOs
+ * This class performs a differential operation on IDifferentiableEntity POJOs
  * </p>
  */
 
 @SuppressWarnings("unchecked")
-public class DifferentialEntityAnalyzer<T extends IDifferentiable> implements IDifferentialEntityAnalyzer {
+public class DifferentialEntityAnalyzer<T extends IDifferentiableEntity> implements IDifferentialEntityAnalyzer {
 
     private final HashMap<Field, Object> differenceValues = new HashMap<>();
 
