@@ -1,11 +1,13 @@
 package difflib;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -31,6 +33,8 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
     private boolean isRun = false;
 
     private int depthCount = 0;
+
+    private ObjectMapper objectMapper;
 
     public DifferentialEntityAnalyzer(@NotNull T oldEntity, @NotNull T newEntity, DifferentiableLevel differentiableLevel) {
 
@@ -122,7 +126,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
 
                                 final DifferentialEntityAnalyzer<T> differentialEntityAnalyzer = new DifferentialEntityAnalyzer(_oldEntity, _newEntity, true, oldEntity, depthCount + 1);
 
-                                if(depthCount >= DEPTH_COUNT_MAX)
+                                if (depthCount >= DEPTH_COUNT_MAX)
 
                                     differentialEntityAnalyzer.setDifferentiableLevel(DifferentiableLevel.SHALLOW_UPDATE);
 
@@ -139,39 +143,6 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
 
 
                     } else if (List.class.isAssignableFrom(fieldType)) {
-
-//                        final Class<?> listType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-//
-//                        if (DifferentiableEntity.class.isAssignableFrom(listType)) {
-//
-//                            final ArrayList<DifferentiableEntity> oldLists = new ArrayList<>();
-//
-//                            final ArrayList<DifferentiableEntity> newLists = new ArrayList<>();
-//
-//                            for (int i = 0; i < ((ArrayList<? extends DifferentiableEntity>) field.get(oldEntity)).size(); i++) {
-//
-//                                final DifferentiableEntity diffEntity = ((ArrayList<? extends DifferentiableEntity>) field.get(oldEntity)).get(i);
-//
-//                                oldLists.add(diffEntity);
-//                            }
-//
-//                            for (int j = 0; j < ((ArrayList<? extends IDifferentiable>) field.get(newEntity)).size(); j++) {
-//
-//                                final DifferentiableEntity diffEntity = ((ArrayList<? extends DifferentiableEntity>) field.get(newEntity)).get(j);
-//
-//                                newLists.add(diffEntity);
-//                            }
-//
-//                            if (oldLists.size() <= newLists.size()) {
-//                                /***
-//                                 *
-//                                 */
-//
-//                            }
-//
-//                        }
-
-                        //
 
                         /*
                         Ignore checking diff for list items, and take the new list as a diff
@@ -214,7 +185,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
     public boolean hasDifference() {
 
         if (!isRun)
-           throwNotRunException();
+            throwNotRunException();
 
         return !differenceValues.isEmpty();
     }
@@ -285,26 +256,66 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
         this.differentiableLevel = differentiableLevel;
     }
 
-    public String getJsonForm(){
+    public String getPrettyJson() {
 
-        if(!isRun)
+        if (!isRun)
             throwNotRunException();
 
-        final ObjectMapper objectMapper = new ObjectMapper();
-
-        final ObjectWriter writer = objectMapper.writer().withDefaultPrettyPrinter();
+        final ObjectWriter writer = getObjectMapper().writer().withDefaultPrettyPrinter();
 
         try {
+
             return writer.writeValueAsString(differenceValues);
 
         } catch (JsonProcessingException e) {
 
-            throw new DifferentialException(e.getLocalizedMessage(), DifferentialException.RUNTIME_ERROR , e);
+            throw new DifferentialException(e.getLocalizedMessage(), DifferentialException.RUNTIME_ERROR, e);
         }
 
     }
 
-    private void throwNotRunException(){
+    private void throwNotRunException() {
         throw new DifferentialException("differential has not been run. make sure you have called runDifferential() first.", DifferentialException.RUNTIME_ERROR, null);
+    }
+
+    private class FieldSerializer extends JsonSerializer<HashMap<Field, Object>> {
+
+        @Override
+        public void serialize(HashMap<Field, Object> fieldObjectHashMap, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
+
+            jsonGenerator.writeStartObject();
+
+            for (Field field : fieldObjectHashMap.keySet()) {
+
+                if (fieldObjectHashMap.getClass().isAssignableFrom(fieldObjectHashMap.get(field).getClass())) {
+
+                    final ObjectWriter writer = getObjectMapper().writer().withDefaultPrettyPrinter();
+
+                    jsonGenerator.writeStringField(field.getName(), writer.writeValueAsString(fieldObjectHashMap.get(field)));
+
+                    continue;
+                }
+
+                jsonGenerator.writeStringField(field.getName(), String.valueOf(fieldObjectHashMap.get(field)));
+            }
+        }
+    }
+
+    private ObjectMapper getObjectMapper() {
+
+        if (objectMapper == null) {
+
+            objectMapper = new ObjectMapper();
+
+            SimpleModule simpleModule = new SimpleModule();
+
+            simpleModule.addSerializer((Class<? extends HashMap<Field, Object>>) differenceValues.getClass(), new FieldSerializer());
+
+            objectMapper.registerModule(simpleModule);
+
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        }
+
+        return objectMapper;
     }
 }

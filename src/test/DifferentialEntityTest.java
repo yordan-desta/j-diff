@@ -1,6 +1,7 @@
 package test;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import difflib.Differentiable;
 import difflib.DifferentiableEntity;
 import difflib.DifferentiableLevel;
@@ -11,6 +12,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -68,7 +72,6 @@ public class DifferentialEntityTest{
 
         private A a;
 
-
         B(Integer intValue, Double doubleValue, String uuid, A a) {
 
             this.intValue = intValue;
@@ -95,7 +98,6 @@ public class DifferentialEntityTest{
     class C extends DifferentiableEntity {
 
         private B b;
-
 
         public B getB() {
             return b;
@@ -154,6 +156,12 @@ public class DifferentialEntityTest{
 
         DifferentialEntityAnalyzer differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a3, DifferentiableLevel.DEEP);
 
+        HashMap result = differentialEntityAnalyzer.runDifferential();
+
+        String json = differentialEntityAnalyzer.getPrettyJson();
+
+        Assert.assertTrue(isJsonValid(json));
+
         Assert.assertTrue(differentialEntityAnalyzer.hasDifference());
     }
 
@@ -172,6 +180,10 @@ public class DifferentialEntityTest{
         DifferentialEntityAnalyzer<B> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<B>(b1, b3, DifferentiableLevel.DEEP);
         differentialEntityAnalyzer.runDifferential();
 
+        String json = differentialEntityAnalyzer.getPrettyJson();
+
+        Assert.assertTrue(isJsonValid(json));
+
         Assert.assertTrue(differentialEntityAnalyzer.hasDifference());
     }
 
@@ -180,6 +192,12 @@ public class DifferentialEntityTest{
 
         DifferentialEntityAnalyzer<C> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<>(c1, c3, DifferentiableLevel.DEEP);
         differentialEntityAnalyzer.runDifferential();
+
+        HashMap result = differentialEntityAnalyzer.runDifferential();
+
+        String json = differentialEntityAnalyzer.getPrettyJson();
+
+        Assert.assertTrue(isJsonValid(json));
 
         Assert.assertTrue(differentialEntityAnalyzer.hasDifference());
     }
@@ -284,6 +302,21 @@ public class DifferentialEntityTest{
 
         Assert.assertTrue(differentialEntityAnalyzer.hasDifference());
 
+    }
+
+    private boolean isJsonValid(final String json){
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            objectMapper.readTree(json);
+
+        } catch (IOException e) {
+
+            return false;
+        }
+
+        return true;
     }
 
 }
