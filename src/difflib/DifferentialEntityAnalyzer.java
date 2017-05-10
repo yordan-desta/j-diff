@@ -1,17 +1,13 @@
 package difflib;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
-import sun.rmi.runtime.Log;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Author: Yordanos Desta, on 5/2/17.
@@ -32,7 +28,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
 
     private static final int DEPTH_COUNT_MAX = 2;
 
-    private boolean isRun;
+    private boolean isRun = false;
 
     private int depthCount = 0;
 
@@ -144,36 +140,46 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
 
                     } else if (List.class.isAssignableFrom(fieldType)) {
 
-                        final Class<?> listType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+//                        final Class<?> listType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+//
+//                        if (DifferentiableEntity.class.isAssignableFrom(listType)) {
+//
+//                            final ArrayList<DifferentiableEntity> oldLists = new ArrayList<>();
+//
+//                            final ArrayList<DifferentiableEntity> newLists = new ArrayList<>();
+//
+//                            for (int i = 0; i < ((ArrayList<? extends DifferentiableEntity>) field.get(oldEntity)).size(); i++) {
+//
+//                                final DifferentiableEntity diffEntity = ((ArrayList<? extends DifferentiableEntity>) field.get(oldEntity)).get(i);
+//
+//                                oldLists.add(diffEntity);
+//                            }
+//
+//                            for (int j = 0; j < ((ArrayList<? extends IDifferentiable>) field.get(newEntity)).size(); j++) {
+//
+//                                final DifferentiableEntity diffEntity = ((ArrayList<? extends DifferentiableEntity>) field.get(newEntity)).get(j);
+//
+//                                newLists.add(diffEntity);
+//                            }
+//
+//                            if (oldLists.size() <= newLists.size()) {
+//                                /***
+//                                 *
+//                                 */
+//
+//                            }
+//
+//                        }
 
-                        if (DifferentiableEntity.class.isAssignableFrom(listType)) {
+                        //
 
-                            final ArrayList<DifferentiableEntity> oldLists = new ArrayList<>();
+                        /*
+                        Ignore checking diff for list items, and take the new list as a diff
+                         */
 
-                            final ArrayList<DifferentiableEntity> newLists = new ArrayList<>();
+                        final Object newListValues = field.get(newEntity);
 
-                            for (int i = 0; i < ((ArrayList<? extends DifferentiableEntity>) field.get(oldEntity)).size(); i++) {
-
-                                final DifferentiableEntity diffEntity = ((ArrayList<? extends DifferentiableEntity>) field.get(oldEntity)).get(i);
-
-                                oldLists.add(diffEntity);
-                            }
-
-                            for (int j = 0; j < ((ArrayList<? extends IDifferentiable>) field.get(newEntity)).size(); j++) {
-
-                                final DifferentiableEntity diffEntity = ((ArrayList<? extends DifferentiableEntity>) field.get(newEntity)).get(j);
-
-                                newLists.add(diffEntity);
-                            }
-
-                            if (oldLists.size() <= newLists.size()) {
-                                /***
-                                 *
-                                 */
-
-                            }
-
-                        }
+                        this.differenceValues.put(field, newListValues);
 
                         continue;
                     }
@@ -208,7 +214,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
     public boolean hasDifference() {
 
         if (!isRun)
-            runDifferential();
+           throwNotRunException();
 
         return !differenceValues.isEmpty();
     }
@@ -216,7 +222,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
     public HashMap<Field, Object> getDifferenceValues() {
 
         if (!isRun)
-            return runDifferential();
+            throwNotRunException();
 
         return differenceValues;
     }
@@ -277,5 +283,28 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiable> {
 
     public void setDifferentiableLevel(DifferentiableLevel differentiableLevel) {
         this.differentiableLevel = differentiableLevel;
+    }
+
+    public String getJsonForm(){
+
+        if(!isRun)
+            throwNotRunException();
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        final ObjectWriter writer = objectMapper.writer().withDefaultPrettyPrinter();
+
+        try {
+            return writer.writeValueAsString(differenceValues);
+
+        } catch (JsonProcessingException e) {
+
+            throw new DifferentialException(e.getLocalizedMessage(), DifferentialException.RUNTIME_ERROR , e);
+        }
+
+    }
+
+    private void throwNotRunException(){
+        throw new DifferentialException("differential has not been run. make sure you have called runDifferential() first.", DifferentialException.RUNTIME_ERROR, null);
     }
 }
