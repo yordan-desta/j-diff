@@ -17,4 +17,6 @@ public interface IDifferentialEntityAnalyzer {
     boolean hasDifference();
 
     String getPrettyJson();
+
+    void setMaxDepthCount(int maxDepthCount);
 }

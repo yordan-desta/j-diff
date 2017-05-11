@@ -31,7 +31,9 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiableEntity> impleme
 
     private static final Map<String, HashSet<Field>> clazzFieldsCache = new LinkedHashMap<>();
 
-    private static final int DEPTH_COUNT_MAX = 2;
+    private static final int DEFAULT_DEPTH_COUNT_MAX = 2;
+
+    private int maxDepthCount = DEFAULT_DEPTH_COUNT_MAX;
 
     private boolean isRun = false;
 
@@ -133,7 +135,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiableEntity> impleme
 
                                 final DifferentialEntityAnalyzer<T> differentialEntityAnalyzer = new DifferentialEntityAnalyzer(_oldEntity, _newEntity, true, oldEntity, depthCount + 1);
 
-                                if (depthCount >= DEPTH_COUNT_MAX)
+                                if (depthCount >= maxDepthCount)
 
                                     differentialEntityAnalyzer.setDifferentiableLevel(DifferentiableLevel.SHALLOW_UPDATE);
 
@@ -333,5 +335,10 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiableEntity> impleme
 
             return objectMapper;
         }
+    }
+
+    public void setMaxDepthCount(int maxDepthCount){
+
+        this.maxDepthCount = maxDepthCount;
     }
 }

@@ -100,4 +100,8 @@ public class DifferentialEntityAnalyzerAsync<C extends IDifferentiableCallback, 
             runnable = null;
         }
     }
+
+    public void setMaxDepthCount(int maxDepthCount){
+        differentialEntityAnalyzer.setMaxDepthCount(maxDepthCount);
+    }
 }
