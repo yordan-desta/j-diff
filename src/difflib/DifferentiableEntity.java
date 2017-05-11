@@ -37,7 +37,7 @@ public abstract class DifferentiableEntity implements IDifferentiableEntity {
      * returns the class name
      * @return class name
      */
-    public String getClazzName() {
+    public final String getClazzName() {
         return clazzName;
     }
 

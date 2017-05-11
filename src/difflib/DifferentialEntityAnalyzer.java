@@ -82,7 +82,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiableEntity> impleme
             throw new DifferentialException(errMsg, DifferentialException.NULL_ENTITY_EXCEPTION, new Throwable(errMsg));
 
 
-        } else if (!oldEntity.getClazzName().equals(newEntity.getClazzName())) {
+        } else if (!oldEntity.getClass().getSimpleName().equals(newEntity.getClass().getSimpleName())) {
 
             final String errMsg = "entity types are different. They should be of the same class type";
 
@@ -91,7 +91,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiableEntity> impleme
 
         } else if (oldEntity.getClass().getAnnotation(Differentiable.class) != null && oldEntity.getClass().getAnnotation(Differentiable.class).ignoreDiff()) {
 
-            final String errMsg = oldEntity.getClazzName() + " is not differentiable class";
+            final String errMsg = oldEntity.getClass().getSimpleName() + " is not differentiable class";
 
             throw new DifferentialException(errMsg, DifferentialException.NON_DIFFERENTIABLE_CLASS_EXCEPTION, new Throwable(errMsg));
 
