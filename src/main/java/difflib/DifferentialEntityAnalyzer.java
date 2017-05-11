@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -45,14 +43,14 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiableEntity> impleme
 
     private String jsonValue;
 
-    public DifferentialEntityAnalyzer(@NotNull T oldEntity, @NotNull T newEntity, DifferentiableLevel differentiableLevel) {
+    public DifferentialEntityAnalyzer( T oldEntity,  T newEntity, DifferentiableLevel differentiableLevel) {
 
         this(oldEntity, newEntity);
 
         setDifferentiableLevel(differentiableLevel);
     }
 
-    private DifferentialEntityAnalyzer(@NotNull T oldEntity, @NotNull T newEntity, boolean isReferenced, @Nullable T referencer, int depthCount) {
+    private DifferentialEntityAnalyzer( T oldEntity,  T newEntity, boolean isReferenced,  T referencer, int depthCount) {
 
         this(oldEntity, newEntity);
 
@@ -64,7 +62,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiableEntity> impleme
 
     }
 
-    public DifferentialEntityAnalyzer(@NotNull T oldEntity, @NotNull T newEntity) {
+    public DifferentialEntityAnalyzer( T oldEntity,  T newEntity) {
 
         isRun = false;
 
@@ -133,7 +131,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiableEntity> impleme
                                         continue;
                                 }
 
-                                final DifferentialEntityAnalyzer<T> differentialEntityAnalyzer = new DifferentialEntityAnalyzer(_oldEntity, _newEntity, true, oldEntity, depthCount + 1);
+                                final DifferentialEntityAnalyzer<T> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<T>(_oldEntity, _newEntity, true, oldEntity, depthCount + 1);
 
                                 if (depthCount >= maxDepthCount)
 

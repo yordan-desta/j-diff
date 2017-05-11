@@ -1,7 +1,5 @@
 package difflib;
 
-import com.sun.istack.internal.NotNull;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
@@ -23,14 +21,14 @@ public class DifferentialEntityAnalyzerAsync<C extends IDifferentiableCallback, 
 
     private final C context;
 
-    public DifferentialEntityAnalyzerAsync(C context, @NotNull T oldEntity, @NotNull T newEntity, DifferentiableLevel differentiableLevel) {
+    public DifferentialEntityAnalyzerAsync(C context, T oldEntity, T newEntity, DifferentiableLevel differentiableLevel) {
 
         differentialEntityAnalyzer = new DifferentialEntityAnalyzer<T>(oldEntity, newEntity, differentiableLevel);
 
         this.context = context;
     }
 
-    public DifferentialEntityAnalyzerAsync(C context, @NotNull T oldEntity, @NotNull T newEntity) {
+    public DifferentialEntityAnalyzerAsync(C context, T oldEntity, T newEntity) {
 
         differentialEntityAnalyzer = new DifferentialEntityAnalyzer<T>(oldEntity, newEntity);
 

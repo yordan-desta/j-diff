@@ -6,6 +6,8 @@ package difflib;
 
 class DifferentialException extends RuntimeException {
 
+    private static final long serialVersionUID = 2544587;
+
     private final int code;
 
     public static final int NULL_ENTITY_EXCEPTION = 2001;
