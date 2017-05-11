@@ -60,3 +60,69 @@ public class SomeDiffClass implements IDifferentiableEntity{
  or extends from <i>DifferentiableEntity</i> you can annotate any class you do not want to be
  differentiated, just like the fields in the example above.
  
+  <h3>2. DifferentiableLevel </h3>
+  
+  J-diff allows you to modify how deep you want objects differentiated through 3 levels.
+  
+  <h4> 2.1. SHALLOW_UPDATE (default) </h4>
+  This level wil track the differential for primitive types, Dates and Strings. For differentiable class objects and lists field, 
+  it will set the new field as the diff result. It will not go deeper to find which fields of the new object
+  has changed.
+  
+   <h4> 2.2. SHALLOW_IGNORE </h4>
+    This is similar to the SHALLOW_UPDATE but instead of setting the the new field as a result
+    it will be ignored.
+    
+   <h4> 2.3. DEEP </h4>
+      Does what SHALLOW_UPDATE does but also goes deeper to find what fields of the object (in the new IDifferentiable object)
+      are different (if they are) and returns those values. By default it would go two levels but you can
+      change it by <i>setMaxDepthCount (int maxDepthCount)</i> method.
+    
+ 
+ <h3>3. DifferentialEntityAnalyzerAsync </h3>
+ 
+ J-diff allows you to perform differential analysis asynchronously and notifies the calling class
+ upon completion through <i>IDifferentiableCallback</i>. Upon successful completion, an <i>AsyncDiffResult</i>
+ object will be returned.
+ 
+# Usage
+
+```java
+
+    
+     IDifferentialEntityAnalyzer analyzer = new DifferentialEntityAnalyzer<SomeDiffClass>(oldObject, newObject);
+     HashMap<Field, Object> result = analyzer.runDifferential(); //returns Field Object hashmap
+        
+     String jsonForm = analyzer.getPrettyJson();// returns json form result
+     
+     // creating analyzer with custom depth
+     
+     IDifferentialEntityAnalyzer analyzerWithDepth = new DifferentialEntityAnalyzer<SomeDiffClass>(oldObject, newObject,DifferentiableLevel.DEEP);
+
+
+```
+Asynchronous call
+
+```java
+class CallingClass implements IDifferentiableCallback{
+
+    ....................
+    
+    DifferentialEntityAnalyzerAsync asyncAnalyzer = new DifferentialEntityAnalyzerAsync<CallingClass, SomeDiffClass>(this, oldObject, newObject);
+    asyncAnalyzer.runDifferential();
+    
+    @Override
+    public void onSuccess(AsyncDiffResult asyncDiffResult) {
+
+        //do on successful result
+    }
+
+    @Override
+    public void onError(DifferentialException exception) {
+
+        //log error or what ever you want on failure
+    }
+
+}
+```
+ 
