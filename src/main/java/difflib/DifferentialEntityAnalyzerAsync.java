@@ -7,11 +7,11 @@ import java.util.HashMap;
 
 /**
  * Author : Yordanos Desta, on 5/10/17.
- *
+ * <p>
  * This class performs a Differential operation on a {@link IDifferentiableEntity} class asynchronously and returns {@link AsyncDiffResult} object
  * to the result
  */
-public class DifferentialEntityAnalyzerAsync<C extends IDifferentiableCallback, T extends IDifferentiableEntity>{
+public class DifferentialEntityAnalyzerAsync<C extends IDifferentiableCallback, T extends IDifferentiableEntity> {
 
     private Runnable runnable = null;
 
@@ -51,25 +51,28 @@ public class DifferentialEntityAnalyzerAsync<C extends IDifferentiableCallback, 
 
         if (runnable == null) {
 
-            runnable = () -> {
+            runnable = new Runnable() {
 
-                try {
+                public void run() {
 
-                    HashMap<Field, Object> result = differentialEntityAnalyzer.runDifferential();
+                    try {
 
-                    context.onSuccess(new AsyncDiffResult(result, differentialEntityAnalyzer.getPrettyJson(), differentialEntityAnalyzer.hasDifference()));
+                        HashMap<Field, Object> result = differentialEntityAnalyzer.runDifferential();
 
-                } catch (Exception e) {
+                        context.onSuccess(new AsyncDiffResult(result, differentialEntityAnalyzer.getPrettyJson(), differentialEntityAnalyzer.hasDifference()));
 
-                    if (e instanceof DifferentialException)
-                        context.onError((DifferentialException) e);
+                    } catch (Exception e) {
 
-                    else
-                        context.onError(new DifferentialException(e.getLocalizedMessage(), DifferentialException.RUNTIME_ERROR, e));
+                        if (e instanceof DifferentialException)
+                            context.onError((DifferentialException) e);
 
-                } finally {
+                        else
+                            context.onError(new DifferentialException(e.getLocalizedMessage(), DifferentialException.RUNTIME_ERROR, e));
 
-                    destroy();
+                    } finally {
+
+                        destroy();
+                    }
                 }
             };
         }
@@ -87,21 +90,21 @@ public class DifferentialEntityAnalyzerAsync<C extends IDifferentiableCallback, 
      * destroy the thread is any call was made
      */
 
-    public void destroy(){
+    public void destroy() {
 
-        if(thread != null){
+        if (thread != null) {
 
             thread.interrupt();
             thread = null;
         }
 
-        if(runnable != null){
+        if (runnable != null) {
 
             runnable = null;
         }
     }
 
-    public void setMaxDepthCount(int maxDepthCount){
+    public void setMaxDepthCount(int maxDepthCount) {
         differentialEntityAnalyzer.setMaxDepthCount(maxDepthCount);
     }
 }

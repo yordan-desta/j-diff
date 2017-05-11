@@ -1,6 +1,3 @@
-package test;
-
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import difflib.Differentiable;
 import difflib.DifferentiableEntity;
@@ -208,7 +205,7 @@ public class DifferentialEntityTest {
     @Test
     public void checkIfDiffDetectedWith2LevelClassDepthDeep() {
 
-        DifferentialEntityAnalyzer<C> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<>(c1, c3, DifferentiableLevel.DEEP);
+        DifferentialEntityAnalyzer<C> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<C>(c1, c3, DifferentiableLevel.DEEP);
         differentialEntityAnalyzer.runDifferential();
 
         HashMap result = differentialEntityAnalyzer.runDifferential();
@@ -223,7 +220,7 @@ public class DifferentialEntityTest {
     @Test
     public void checkIfNoDiffDetectedWith2LevelClassDepthDeep() {
 
-        DifferentialEntityAnalyzer<C> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<>(c1, c2, DifferentiableLevel.DEEP);
+        DifferentialEntityAnalyzer<C> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<C>(c1, c2, DifferentiableLevel.DEEP);
         differentialEntityAnalyzer.runDifferential();
 
         String json = differentialEntityAnalyzer.getPrettyJson();
@@ -282,12 +279,12 @@ public class DifferentialEntityTest {
 
         Assert.assertTrue(differentialEntityAnalyzer2.hasDifference());
 
-        DifferentialEntityAnalyzer<C> differentialEntityAnalyzer3 = new DifferentialEntityAnalyzer<>(c1, c3, DifferentiableLevel.SHALLOW_UPDATE);
+        DifferentialEntityAnalyzer<C> differentialEntityAnalyzer3 = new DifferentialEntityAnalyzer<C>(c1, c3, DifferentiableLevel.SHALLOW_UPDATE);
         differentialEntityAnalyzer3.runDifferential();
 
         Assert.assertTrue(differentialEntityAnalyzer3.hasDifference());
 
-        DifferentialEntityAnalyzer<C> differentialEntityAnalyzer4 = new DifferentialEntityAnalyzer<>(c1, c2, DifferentiableLevel.SHALLOW_UPDATE);
+        DifferentialEntityAnalyzer<C> differentialEntityAnalyzer4 = new DifferentialEntityAnalyzer<C>(c1, c2, DifferentiableLevel.SHALLOW_UPDATE);
         differentialEntityAnalyzer4.runDifferential();
 
         Assert.assertTrue(differentialEntityAnalyzer4.hasDifference());

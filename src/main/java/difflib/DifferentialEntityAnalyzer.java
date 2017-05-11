@@ -21,7 +21,7 @@ import java.util.*;
 @SuppressWarnings("unchecked")
 public class DifferentialEntityAnalyzer<T extends IDifferentiableEntity> implements IDifferentialEntityAnalyzer {
 
-    private final HashMap<Field, Object> differenceValues = new HashMap<>();
+    private final HashMap<Field, Object> differenceValues = new HashMap<Field, Object>();
 
     private DifferentiableLevel differentiableLevel = DifferentiableLevel.SHALLOW_UPDATE;
 
@@ -29,7 +29,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiableEntity> impleme
 
     private boolean isReferenced = false;
 
-    private static final Map<String, HashSet<Field>> clazzFieldsCache = new LinkedHashMap<>();
+    private static final Map<String, HashSet<Field>> clazzFieldsCache = new LinkedHashMap<String, HashSet<Field>>();
 
     private static final int DEFAULT_DEPTH_COUNT_MAX = 2;
 
@@ -220,7 +220,7 @@ public class DifferentialEntityAnalyzer<T extends IDifferentiableEntity> impleme
 
             final String key = clazz.getSimpleName();
 
-            fields = new HashSet<>();
+            fields = new HashSet<Field>();
 
             while (clazz.getSuperclass() != null) {
 
