@@ -34,4 +34,29 @@ public class SomeDiffClass implements IDifferentiableEntity{
 }
 
 ```
+ # Features
+ 
+ <h3>1. @Differentiable </h3>
+ By default every class that implements the IDifferentiableEntity interface or extends from DifferentiableEntity
+ are differentiable. But J-diff gives you the ability to take further control which classes
+ and also fields you want to skip differentiation by annotating them with the <i>@Differentiable</i>
+ annotation. By default its considered differentiable.
+ 
+ ```java
+public class SomeDiffClass implements IDifferentiableEntity{
+
+    @Differentiable(ignoreDiff = true) // difference will be ignored for this field
+    public int someIntField;
+
+    // other differentiable fields with out annotation
+    
+     public String someStringField;
+
+}
+ 
+ ```
+ 
+ And also if you are extending from a base class which implements <i>IDifferentiableEntity</i>
+ or extends from <i>DifferentiableEntity</i> you can annotate any class you do not want to be
+ differentiated, just like the fields in the example above.
  
