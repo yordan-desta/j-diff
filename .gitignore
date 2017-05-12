@@ -14,3 +14,4 @@ hs_err_pid*
 /target/
 /target/surefire-reports/DifferentialEntityTest.txt
 /target/surefire-reports/TEST-DifferentialEntityTest.xml
+*.asc
