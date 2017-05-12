@@ -2,9 +2,25 @@
 J-diff is a simple Java library for finding the difference between two 
 Plain old java objects or POJOs. It will take the two java objects and 
 analyze their difference. It would return the result difference 
-either in the form of <b>HashMap<Field, Object> </b> or as a json. 
+either in the form of HashMap<Field, Object> or as a JSON. 
 
-# IDifferentiableEntity
+Installation
+---
+
+Grab via Maven:
+```xml
+<dependency>
+    <groupId>com.github.yordan-desta</groupId>
+    <artifactId>j-diff</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+or Gradle:
+```groovy
+compile 'com.github.yordan-desta:j-diff:1.0.0'
+```
+IDifferentiableEntity
+---
 J-diff analyzes the difference between entities that implements the
 <i>IDifferentiableEntity</i> interface or extends from <i>DifferentiableEntity</i>.
 The reason for this is because j-diff not only tracks the types of objects but also gives
@@ -34,8 +50,8 @@ public class SomeDiffClass implements IDifferentiableEntity{
 }
 
 ```
- # Features
- 
+ Features
+ ---
  <h3>1. @Differentiable </h3>
  By default every class that implements the IDifferentiableEntity interface or extends from DifferentiableEntity
  are differentiable. But J-diff gives you the ability to take further control which classes
@@ -85,8 +101,8 @@ public class SomeDiffClass implements IDifferentiableEntity{
  upon completion through <i>IDifferentiableCallback</i>. Upon successful completion, an <i>AsyncDiffResult</i>
  object will be returned.
  
-# Usage
-
+Usage
+-----
 ```java
 
     
@@ -125,4 +141,8 @@ class CallingClass implements IDifferentiableCallback{
 
 }
 ```
+
+License
+----
+<h4><a href="https://choosealicense.com/licenses/apache-2.0/">Apache License 2.0</a></h4>
  
