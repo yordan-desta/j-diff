@@ -9,10 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.io.DataOutput;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -158,7 +155,7 @@ public class DifferentialEntityTest {
     @Test
     public void checkIfDifferencialDetectedDeep() {
 
-        DifferentialEntityAnalyzer differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a3, DifferentiableLevel.DEEP);
+        DifferentialEntityAnalyzer<A> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a3, DifferentiableLevel.DEEP);
 
         HashMap result = differentialEntityAnalyzer.runDifferential();
 
@@ -251,7 +248,7 @@ public class DifferentialEntityTest {
     @Test
     public void checkIfDifferentialDetectedShallowUpdate() {
 
-        DifferentialEntityAnalyzer differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a3, DifferentiableLevel.SHALLOW_UPDATE);
+        DifferentialEntityAnalyzer<A> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a3, DifferentiableLevel.SHALLOW_UPDATE);
         differentialEntityAnalyzer.runDifferential();
 
         String json = differentialEntityAnalyzer.getPrettyJson();
@@ -312,7 +309,7 @@ public class DifferentialEntityTest {
     @Test
     public void checkIfDifferentialDetectedShallowIgnore() {
 
-        DifferentialEntityAnalyzer differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a3, DifferentiableLevel.SHALLOW_IGNORE);
+        DifferentialEntityAnalyzer<A> differentialEntityAnalyzer = new DifferentialEntityAnalyzer<A>(a1, a3, DifferentiableLevel.SHALLOW_IGNORE);
         differentialEntityAnalyzer.runDifferential();
 
         String json = differentialEntityAnalyzer.getPrettyJson();

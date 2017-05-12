@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="j-diff" target="1.6" />
+      <module name="j-diff" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>
